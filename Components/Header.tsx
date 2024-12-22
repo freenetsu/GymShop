@@ -4,7 +4,7 @@ import { VisibleMenu } from "@/Components/VisibleMenu";
 import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
 import { SessionProvider } from "next-auth/react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,21 +16,21 @@ export default function Navbar() {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setShowMenu(false);
-      }
-    };
+  // useEffect(() => {
+  //   const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+  //     if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+  //       setShowMenu(false);
+  //     }
+  //   };
 
-    document.addEventListener("click", handleClickOutside);
-    document.addEventListener("touchstart", handleClickOutside);
+  //   document.addEventListener("click", handleClickOutside);
+  //   document.addEventListener("touchstart", handleClickOutside);
 
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
-    };
-  }, []);
+  //   return () => {
+  //     document.removeEventListener("click", handleClickOutside);
+  //     document.removeEventListener("touchstart", handleClickOutside);
+  //   };
+  // }, []);
 
   return (
     <nav className="bg-black shadow-lg">
