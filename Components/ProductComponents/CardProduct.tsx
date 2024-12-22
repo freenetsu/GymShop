@@ -4,9 +4,25 @@ import { Code } from "@/Components/Code";
 import { Card, CardHeader } from "@nextui-org/card";
 import { Star } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { AddProductToCart } from "./AddProductToCart";
 
-export default function CardProduct({ product }) {
+type Product = {
+  id: string;
+  name: string;
+  description: string | null;
+  type: string | null;
+  prix: number;
+  stock: number;
+  image: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  rating: number | null;
+};
+
+type CardProductProps = {
+  product: Product;
+};
+
+export default function CardProduct({ product }: CardProductProps) {
   const { data: session, status } = useSession();
 
   // ID de l'utilisateur connecté
@@ -49,14 +65,14 @@ export default function CardProduct({ product }) {
               }`}
             />
           ))}
-          <span className="ml-2 text-sm text-gray-400">
+          {/* <span className="ml-2 text-sm text-gray-400">
             {product.reviews || 0} avis
-          </span>
+          </span> */}
         </div>
         <p className="mt-2 text-xl font-bold">${product.prix.toFixed(2)}</p>
       </div>
       {/* Appel corrigé avec la gestion de l'ID utilisateur */}
-      <AddProductToCart productId={product.id} userId={currentUserId} />
+      {/* <AddProductToCart productId={product.id} userId={currentUserId} /> */}
     </Card>
   );
 }
