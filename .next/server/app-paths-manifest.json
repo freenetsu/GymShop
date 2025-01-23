@@ -1,7 +1,9 @@
 {
-  "/UserData/page": "app/UserData/page.js",
-  "/Accessory/page": "app/Accessory/page.js",
+  "/api/cart/[userId]/route": "app/api/cart/[userId]/route.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/page": "app/page.js",
+  "/[id]/page": "app/[id]/page.js",
+  "/account/page": "app/account/page.js",
   "/ListUsers/page": "app/ListUsers/page.js",
   "/ListProducts/page": "app/ListProducts/page.js"
 }

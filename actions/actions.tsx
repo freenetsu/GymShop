@@ -74,32 +74,146 @@ export async function updateProduct(formData: FormData) {
 }
 
 export async function addProductToCart(productId: string, userId: string) {
-  // Rechercher un panier existant pour l'utilisateur
-  let cart = await prisma.cart.findFirst({
-    where: {
-      id: userId,
-    },
-  });
+  try {
+    // Vérifier si le produit existe
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+    });
 
-  // Si aucun panier n'existe, en créer un
-  if (!cart) {
-    cart = await prisma.cart.create({
-      data: {
-        userId,
+    if (!product) {
+      throw new Error("Produit non trouvé");
+    }
+
+    // Vérifier si l'utilisateur existe
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new Error("Utilisateur non trouvé");
+    }
+
+    // Rechercher un panier existant pour l'utilisateur
+    let cart = await prisma.cart.findFirst({
+      where: {
+        userId: userId,
+      },
+      include: {
+        products: true,
       },
     });
+
+    // Si aucun panier n'existe, en créer un
+    if (!cart) {
+      cart = await prisma.cart.create({
+        data: {
+          userId,
+          products: {
+            connect: { id: productId },
+          },
+        },
+        include: {
+          products: true,
+        },
+      });
+    } else {
+      // Vérifier si le produit est déjà dans le panier
+      const productExists = cart.products.some((p) => p.id === productId);
+
+      if (!productExists) {
+        // Ajouter le produit au panier existant
+        await prisma.cart.update({
+          where: { id: cart.id },
+          data: {
+            products: {
+              connect: { id: productId },
+            },
+          },
+        });
+      }
+    }
+
+    revalidatePath("/cart");
+    return { success: true };
+  } catch (error) {
+    console.error("Erreur lors de l'ajout au panier:", error);
+    throw error;
+  }
+}
+
+export async function getProductById(id: string) {
+  if (!id || typeof id !== "string") {
+    throw new Error("Invalid product ID");
   }
 
-  // Ajouter le produit au panier (connecter via l'ID)
-  await prisma.cart.update({
-    where: { id: cart.id },
-    data: {
-      products: {
-        connect: { id: productId },
-      },
-    },
-  });
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id },
+    });
 
-  // Revalidation de la page du panier
-  revalidatePath(`/cart/${userId}`);
+    if (!product) {
+      throw new Error("Product not found");
+    }
+
+    return product;
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    throw new Error("Unable to fetch product");
+  }
+}
+
+export async function searchProducts(query: string): Promise<
+  Array<{
+    id: string;
+    name: string;
+    description: string | null;
+    prix: number;
+    image: string | null;
+    type: string | null;
+  }>
+> {
+  if (!query || query.trim() === "") {
+    return [];
+  }
+
+  try {
+    const products = await prisma.product.findMany({
+      where: {
+        OR: [
+          {
+            name: {
+              contains: query,
+              mode: "insensitive",
+            },
+          },
+          {
+            description: {
+              contains: query,
+              mode: "insensitive",
+            },
+          },
+          {
+            type: {
+              contains: query,
+              mode: "insensitive",
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        prix: true,
+        image: true,
+        type: true,
+      },
+      take: 5,
+    });
+
+    return products;
+  } catch (error) {
+    console.error("Erreur lors de la recherche:", error);
+    return []; // Retourner un tableau vide au lieu de lancer une erreur
+  }
 }

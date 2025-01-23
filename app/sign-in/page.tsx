@@ -1,4 +1,5 @@
 import LoginGoogle from "@/Components/AuthComponents/LoginGoogle";
+import LoginForm from "../../Components/AuthComponents/LoginForm";
 import LoginGithub from "../../Components/AuthComponents/LoginGithub";
 
 const SignIn = () => {
@@ -10,6 +11,7 @@ const SignIn = () => {
         </h1>
         <LoginGithub />
         <LoginGoogle />
+        <LoginForm />
       </section>
     </div>
   );

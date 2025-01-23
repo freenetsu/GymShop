@@ -1,16 +1,34 @@
 "use client";
 
 import { VisibleMenu } from "@/Components/VisibleMenu";
-import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
-import { SessionProvider } from "next-auth/react";
+import { Menu, ShoppingCart, User, X } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { SearchBar } from "./SearchBar";
 
 export default function Navbar() {
+  const { data: session, status } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  const [cartBubble, setCartBubble] = useState(0); // State pour la bulle
+  const [cartItemCount, setCartItemCount] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetchCartItemCount();
+    }
+  }, [session]);
+
+  const fetchCartItemCount = async () => {
+    try {
+      const response = await fetch(`/api/cart/${session?.user?.id}`);
+      const products = await response.json();
+      setCartItemCount(products.length);
+    } catch (error) {
+      console.error("Erreur lors du chargement du nombre d'articles:", error);
+    }
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -33,12 +51,15 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="bg-black shadow-lg">
+    <nav className="fixed top-0 left-0 right-0 z-50 glass-morphism">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link href="/" className="text-2xl font-bold text-white">
+            <Link 
+              href="/" 
+              className="text-2xl font-bold gradient-text font-heading"
+            >
               GymShop
             </Link>
           </div>
@@ -48,13 +69,13 @@ export default function Navbar() {
             <div className="ml-10 flex items-baseline space-x-4">
               <Link
                 href="/Dress"
-                className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                className="text-gray-300 hover:text-white hover:bg-primary-600/20 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Vetements
               </Link>
               <Link
                 href="/Accessory"
-                className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                className="text-gray-300 hover:text-white hover:bg-primary-600/20 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Accessoires
               </Link>
@@ -63,123 +84,77 @@ export default function Navbar() {
 
           {/* Search Bar */}
           <div className="hidden md:block flex-1 max-w-md mx-4">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Rechercher un produit..."
-                className="w-full px-4 py-2 rounded-full bg-gray-800 text-white border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400"
-              />
-              <button className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <Search className="h-5 w-5 text-gray-400" />
-              </button>
-            </div>
+            <SearchBar />
           </div>
 
-          {/* User Account and Cart */}
-          <div className="hidden md:flex items-center">
-            <div className="relative" onMouseEnter={() => setShowMenu(true)}>
+          {/* Cart and User Menu */}
+          <div className="flex items-center space-x-4">
+            <Link 
+              href="/cart" 
+              className="relative text-gray-300 hover:text-white hover-effect p-2 rounded-full hover:bg-primary-600/20"
+            >
+              <ShoppingCart className="h-6 w-6" />
+              {cartItemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-secondary-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-float">
+                  {cartItemCount}
+                </span>
+              )}
+            </Link>
+
+            <div 
+              className="relative" 
+              onMouseEnter={() => setShowMenu(true)}
+            >
               <div className="relative" ref={menuRef}>
-                <div
+                <button
                   onClick={() => setShowMenu(!showMenu)}
-                  className="text-gray-300 hover:text-white p-2 cursor-pointer"
+                  className="text-gray-300 hover:text-white hover-effect p-2 rounded-full hover:bg-primary-600/20"
                 >
                   <User className="h-6 w-6" />
-                </div>
-                <SessionProvider>
-                  {/* Menu déroulant */}
-                  {showMenu && <VisibleMenu />}
-                </SessionProvider>
+                </button>
+                {showMenu && <VisibleMenu />}
               </div>
             </div>
-
-            <div className="relative">
-              <Link
-                href="/cart"
-                className="text-gray-300 hover:text-white p-2 ml-4"
-              >
-                <ShoppingCart className="h-6 w-6" />
-                <span className="sr-only">Shopping cart</span>
-              </Link>
-
-              {/* Bulle au-dessus de l'icône */}
-              {cartBubble > 0 && (
-                <div className="absolute top-2 -right-3 bg-red-600 text-white text-xs font-bold h-5 w-5 flex items-center justify-center rounded-full">
-                  {cartBubble}
-                </div>
-              )}
-            </div>
-            <button
-              onClick={() => setCartBubble(cartBubble + 1)}
-              className="ml-4 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-            >
-              Ajouter au panier
-            </button>
           </div>
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button
               onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-400"
+              className="text-gray-300 hover:text-white hover-effect p-2 rounded-full hover:bg-primary-600/20"
             >
-              <span className="sr-only">Open main menu</span>
               {isMenuOpen ? (
-                <X className="block h-6 w-6" aria-hidden="true" />
+                <X className="h-6 w-6" />
               ) : (
-                <Menu className="block h-6 w-6" aria-hidden="true" />
+                <Menu className="h-6 w-6" />
               )}
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link
-              href="/categories/electronics"
-              className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-            >
-              Electronics
-            </Link>
-            <Link
-              href="/categories/clothing"
-              className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-            >
-              Clothing
-            </Link>
-            <Link
-              href="/categories/home"
-              className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-            >
-              Home & Garden
-            </Link>
-          </div>
-          <div className="pt-4 pb-3 border-t border-gray-700">
-            <div className="flex items-center px-5">
-              <Link href="/account" className="text-gray-300 hover:text-white">
-                <User className="h-6 w-6" />
-                <span className="sr-only">User account</span>
+        {/* Mobile menu */}
+        {isMenuOpen && (
+          <div className="md:hidden glass-morphism mt-2 rounded-lg overflow-hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              <Link
+                href="/Dress"
+                className="text-gray-300 hover:text-white hover:bg-primary-600/20 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+              >
+                Vetements
               </Link>
               <Link
-                href="/cart"
-                className="text-gray-300 hover:text-white ml-4"
+                href="/Accessory"
+                className="text-gray-300 hover:text-white hover:bg-primary-600/20 block px-3 py-2 rounded-md text-base font-medium transition-colors"
               >
-                <ShoppingCart className="h-6 w-6" />
-                <span className="sr-only">Shopping cart</span>
+                Accessoires
               </Link>
-            </div>
-            <div className="mt-3 px-2">
-              <input
-                type="text"
-                placeholder="Rechercher un produit..."
-                className="w-full px-4 py-2 rounded-full bg-gray-800 text-white border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400"
-              />
+              <div className="px-3 py-2">
+                <SearchBar />
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </nav>
   );
 }

@@ -1,0 +1,55 @@
+/* Product Details Animations */
+.product-image {
+  transition: transform 0.3s ease-in-out;
+}
+
+.product-image:hover {
+  transform: scale(1.05);
+}
+
+.stock-badge {
+  transition: all 0.2s ease;
+}
+
+.stock-badge:hover {
+  transform: translateY(-2px);
+}
+
+.feature-item {
+  transition: all 0.2s ease;
+}
+
+.feature-item:hover {
+  transform: translateX(5px);
+  color: #fff;
+}
+
+/* Product Card Hover Effects */
+.product-card {
+  transition: all 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Loading Skeleton Animation */
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.loading-skeleton {
+  animation: pulse 1.5s infinite;
+  background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+  background-size: 200% 100%;
+  animation: pulse 1.5s infinite;
+}
