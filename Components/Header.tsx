@@ -15,10 +15,10 @@ export default function Navbar() {
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (session?.user?.id) {
+    if (session?.user?.id && status === "authenticated") {
       fetchCartItemCount();
     }
-  }, [session]);
+  }, [session, status]);
 
   const fetchCartItemCount = async () => {
     try {
@@ -56,9 +56,9 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link 
-              href="/" 
-              className="text-2xl font-bold gradient-text font-heading"
+            <Link
+              href="/"
+              className="text-2xl font-bold font-heading  text-gray-300"
             >
               GymShop
             </Link>
@@ -89,8 +89,8 @@ export default function Navbar() {
 
           {/* Cart and User Menu */}
           <div className="flex items-center space-x-4">
-            <Link 
-              href="/cart" 
+            <Link
+              href="/cart"
               className="relative text-gray-300 hover:text-white hover-effect p-2 rounded-full hover:bg-primary-600/20"
             >
               <ShoppingCart className="h-6 w-6" />
@@ -101,10 +101,7 @@ export default function Navbar() {
               )}
             </Link>
 
-            <div 
-              className="relative" 
-              onMouseEnter={() => setShowMenu(true)}
-            >
+            <div className="relative" onMouseEnter={() => setShowMenu(true)}>
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setShowMenu(!showMenu)}

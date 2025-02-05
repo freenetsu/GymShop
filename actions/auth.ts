@@ -1,58 +1,69 @@
 "use server";
+
 import { signIn, signOut } from "@/auth";
 import prisma from "@/db";
 import { AuthError } from "next-auth";
 import { revalidatePath } from "next/cache";
 
 export const login = async (provider: string) => {
-  await signIn(provider, { redirectTo: "/" });
-  revalidatePath("/");
+  try {
+    await signIn(provider, { redirectTo: "/" });
+    revalidatePath("/");
+  } catch (error) {
+    console.error("Login error:", error);
+    throw error;
+  }
 };
 
 export const logout = async () => {
-  await signOut({ redirectTo: "/" });
-  revalidatePath("/");
+  try {
+    await signOut({ redirectTo: "/" });
+    revalidatePath("/");
+  } catch (error) {
+    console.error("Logout error:", error);
+    throw error;
+  }
 };
 
 const getUserByEmail = async (email: string) => {
   try {
     const user = await prisma.user.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
     });
     return user;
   } catch (error) {
-    console.log(error);
+    console.error("Error getting user:", error);
     return null;
   }
 };
 
 export const loginWithCreds = async (formData: FormData): Promise<void> => {
-  const rawFormData = {
-    email: formData.get("email"),
-    password: formData.get("password"),
-    role: "ADMIN",
-    redirectTo: "/",
-  };
-
-  const existingUser = await getUserByEmail(formData.get("email") as string);
-  console.log(existingUser);
-
   try {
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    if (!email || !password) {
+      throw new Error("Email and password are required");
+    }
+
+    const rawFormData = {
+      email: email as string,
+      password: password as string,
+      redirectTo: "/",
+    };
+
     await signIn("credentials", rawFormData);
     revalidatePath("/");
-  } catch (error: any) {
+  } catch (error) {
+    console.error("Login error:", error);
     if (error instanceof AuthError) {
       switch (error.type) {
         case "CredentialsSignin":
-          console.error("Invalid credentials!");
-          break;
+          throw new Error("Invalid credentials");
         default:
-          console.error("Something went wrong!");
+          throw new Error("Authentication failed");
       }
-    } else {
-      throw error;
     }
+    throw error;
   }
 };

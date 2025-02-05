@@ -13,14 +13,14 @@ export function TableInfosUser() {
         <table className="min-w-full divide-y divide-gray-700 bg-black">
           <thead className="bg-gray-800">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"></th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider"></th>
+              <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider">
                 Nom
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider">
                 Email
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider">
                 Modifier
               </th>
             </tr>

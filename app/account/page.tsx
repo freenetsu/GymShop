@@ -1,8 +1,8 @@
 "use client";
 
+import { Clock, CreditCard, Package, User } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { User, Package, CreditCard, Clock } from "lucide-react";
 
 type Order = {
   id: string;
@@ -27,17 +27,26 @@ export default function AccountPage() {
   }, [session]);
 
   const renderProfile = () => (
-    <div className="space-y-6">
-      <div className="glass-morphism p-6 rounded-lg">
-        <h3 className="text-xl font-semibold mb-4 gradient-text">Informations personnelles</h3>
-        <div className="space-y-4">
-          <div>
-            <label className="text-sm text-gray-400">Nom</label>
-            <p className="text-white">{session?.user?.name || "Non renseigné"}</p>
+    <div className="space-y-8">
+      <div className="glass-morphism p-8 rounded-xl border border-gray-700/50 shadow-lg">
+        <div className="flex items-center mb-6">
+          <User className="w-8 h-8 text-primary-500 mr-4" />
+          <h3 className="text-2xl font-bold text-gray-300">
+            Informations personnelles
+          </h3>
+        </div>
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-300">Nom</label>
+            <p className="text-lg text-white bg-gray-800/50 p-3 rounded-lg">
+              {session?.user?.name || "Non renseigné"}
+            </p>
           </div>
-          <div>
-            <label className="text-sm text-gray-400">Email</label>
-            <p className="text-white">{session?.user?.email}</p>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-300">Email</label>
+            <p className="text-lg text-white bg-gray-800/50 p-3 rounded-lg">
+              {session?.user?.email}
+            </p>
           </div>
         </div>
       </div>
@@ -45,24 +54,48 @@ export default function AccountPage() {
   );
 
   const renderOrders = () => (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {orders.length > 0 ? (
         orders.map((order) => (
-          <div key={order.id} className="glass-morphism p-4 rounded-lg">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-400">Commande #{order.id}</span>
-              <span className="text-sm font-medium px-2 py-1 rounded-full bg-primary-500/20">
+          <div
+            key={order.id}
+            className="glass-morphism p-6 rounded-xl border border-gray-700/50 shadow-lg hover:border-primary-500/50 transition-all duration-300"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-4">
+                <Package className="w-6 h-6 text-primary-500" />
+                <span className="text-lg font-medium text-white">
+                  Commande #{order.id}
+                </span>
+              </div>
+              <span className="px-4 py-1.5 rounded-full bg-primary-500/20 text-primary-400 font-medium">
                 {order.status}
               </span>
             </div>
-            <div className="text-white font-medium">{order.total.toFixed(2)} €</div>
-            <div className="text-sm text-gray-400">{new Date(order.date).toLocaleDateString()}</div>
+            <div className="grid md:grid-cols-2 gap-4 text-gray-300">
+              <div className="flex items-center space-x-2">
+                <CreditCard className="w-4 h-4" />
+                <span className="font-medium text-white">
+                  {order.total.toFixed(2)} €
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Clock className="w-4 h-4" />
+                <span>{new Date(order.date).toLocaleDateString()}</span>
+              </div>
+            </div>
           </div>
         ))
       ) : (
-        <div className="text-center py-8 glass-morphism rounded-lg">
-          <Package className="w-12 h-12 mx-auto text-gray-400 mb-2" />
-          <p className="text-gray-400">Aucune commande pour le moment</p>
+        <div className="text-center py-12 glass-morphism rounded-xl border border-gray-700/50">
+          <Package className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+          <p className="text-xl text-gray-300">
+            Aucune commande pour le moment
+          </p>
+          <p className="text-gray-400 mt-2">
+            Vos commandes apparaîtront ici une fois que vous aurez effectué un
+            achat
+          </p>
         </div>
       )}
     </div>
@@ -71,8 +104,8 @@ export default function AccountPage() {
   return (
     <div className="min-h-screen pt-20 pb-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold gradient-text mb-8">Mon Compte</h1>
-        
+        <h1 className="text-3xl font-bold  text-gray-300 mb-8">Mon Compte</h1>
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Sidebar */}
           <div className="glass-morphism p-4 rounded-lg h-fit">
