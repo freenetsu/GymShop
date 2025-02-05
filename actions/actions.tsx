@@ -182,20 +182,17 @@ export async function searchProducts(query: string): Promise<
         OR: [
           {
             name: {
-              contains: query,
-              mode: "insensitive",
+              contains: query.toLowerCase(),
             },
           },
           {
             description: {
-              contains: query,
-              mode: "insensitive",
+              contains: query.toLowerCase(),
             },
           },
           {
             type: {
-              contains: query,
-              mode: "insensitive",
+              contains: query.toLowerCase(),
             },
           },
         ],

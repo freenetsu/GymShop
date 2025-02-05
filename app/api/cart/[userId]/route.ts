@@ -1,29 +1,33 @@
-import { NextResponse } from "next/server";
 import prisma from "@/db";
+
+interface Context {
+  params: { userId: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+}
 
 export async function GET(
   request: Request,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    console.log("Getting cart for user:", params.userId);
-    
+    const { userId } = await params;
+    console.log("Getting cart for user:", userId);
+
     // Vérifier si l'utilisateur existe
     const user = await prisma.user.findUnique({
       where: {
-        id: params.userId,
+        id: userId,
       },
     });
 
     if (!user) {
-      console.log("User not found");
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return Response.json({ error: "Utilisateur non trouvé" }, { status: 404 });
     }
 
     // Trouver ou créer un panier pour l'utilisateur
     let cart = await prisma.cart.findFirst({
       where: {
-        userId: params.userId,
+        userId: userId,
       },
       include: {
         products: true,
@@ -34,7 +38,7 @@ export async function GET(
       console.log("Creating new cart for user");
       cart = await prisma.cart.create({
         data: {
-          userId: params.userId,
+          userId: userId,
         },
         include: {
           products: true,
@@ -42,12 +46,11 @@ export async function GET(
       });
     }
 
-    console.log("Cart found:", cart);
-    return NextResponse.json(cart.products);
+    return Response.json(cart);
   } catch (error) {
-    console.error("Erreur détaillée lors de la récupération du panier:", error);
-    return NextResponse.json(
-      { error: "Erreur serveur", details: error.message },
+    console.error("Error in GET cart:", error);
+    return Response.json(
+      { error: "Erreur lors de la récupération du panier" },
       { status: 500 }
     );
   }

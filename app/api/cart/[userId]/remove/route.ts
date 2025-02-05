@@ -1,24 +1,26 @@
-import { NextResponse } from "next/server";
 import prisma from "@/db";
+
+interface Context {
+  params: { userId: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+}
 
 export async function POST(
   request: Request,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
+    const { userId } = await params;
     const { productId } = await request.json();
 
     const cart = await prisma.cart.findFirst({
       where: {
-        userId: params.userId,
+        userId: userId,
       },
     });
 
     if (!cart) {
-      return NextResponse.json(
-        { error: "Panier non trouvé" },
-        { status: 404 }
-      );
+      return Response.json({ error: "Panier non trouvé" }, { status: 404 });
     }
 
     await prisma.cart.update({
@@ -34,9 +36,12 @@ export async function POST(
       },
     });
 
-    return NextResponse.json({ success: true });
+    return Response.json({ message: "Produit retiré du panier" });
   } catch (error) {
-    console.error("Erreur lors de la suppression du produit:", error);
-    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+    console.error("Error removing product from cart:", error);
+    return Response.json(
+      { error: "Erreur lors de la suppression du produit du panier" },
+      { status: 500 }
+    );
   }
 }

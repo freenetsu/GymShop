@@ -20,11 +20,11 @@ type Product = {
   rating: number | null;
 };
 
-type CardProductProps = {
+interface CardProductProps {
   product: Product;
-};
+}
 
-export default function CardProduct({ product }: CardProductProps) {
+export function CardProduct({ product }: CardProductProps) {
   const { data: session, status } = useSession();
   const currentUserId = session?.user?.id;
 
@@ -37,30 +37,33 @@ export default function CardProduct({ product }: CardProductProps) {
   }
 
   return (
-    <Card className="w-80 h-auto max-w-sm overflow-hidden bg-black text-white border border-gray-700 rounded-md hover:shadow-lg transition-transform duration-200">
+    <Card className="py-4">
       <Link href={`/${product.id}`}>
-        <CardHeader className="p-0">
-          <div className="relative w-full h-0 pb-[100%]">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="absolute top-0 left-0 w-full h-full object-cover border-b border-gray-700"
-            />
+        <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
+          <p className="text-tiny uppercase font-bold">{product.type}</p>
+          <small className="text-default-500">{product.stock} en stock</small>
+          <h4 className="font-bold text-large">{product.name}</h4>
+          <div className="flex items-center">
+            {product.rating && (
+              <>
+                <Star className="w-4 h-4 text-yellow-400" />
+                <span className="ml-1">{product.rating}</span>
+              </>
+            )}
           </div>
         </CardHeader>
-        <CardBody className="p-4">
-          <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
-          <p className="text-sm text-gray-400 mb-2">{product.description}</p>
-          <div className="flex justify-between items-center">
-            <p className="text-lg font-bold">{product.prix}€</p>
-            <div className="flex items-center">
-              <Star className="w-4 h-4 text-yellow-400 mr-1" />
-              <span>{product.rating || "N/A"}</span>
-            </div>
+        <CardBody className="overflow-visible py-2">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full object-cover h-[140px]"
+          />
+          <div className="flex justify-between items-center mt-4">
+            <div className="text-lg font-bold">{product.prix}€</div>
           </div>
         </CardBody>
       </Link>
-      <AddProductToCart productId={product.id} userId={currentUserId} />
+      <AddProductToCart productId={product.id} />
     </Card>
   );
 }
