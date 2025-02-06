@@ -1,6 +1,5 @@
 "use client";
 
-import { Code } from "@/Components/Code";
 import { AddProductToCart } from "@/Components/ProductComponents/AddProductToCart";
 import { Card, CardHeader, CardBody } from "@nextui-org/card";
 import { Star } from "lucide-react";
