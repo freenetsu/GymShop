@@ -16,10 +16,10 @@ const LoginGoogle = () => {
   return (
     <button
       onClick={handleLogin}
-      className="w-full gap-4 hover:cursor-pointer mt-6 h-12 bg-black border border-gray-700 rounded-md p-4 flex justify-center items-center hover:bg-gray-800"
+      className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white hover:bg-gray-50 text-gray-800 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
     >
-      <FcGoogle />
-      <span className="text-gray-300">Login with Google</span>
+      <FcGoogle className="w-5 h-5" />
+      <span className="font-medium">Continuer avec Google</span>
     </button>
   );
 };

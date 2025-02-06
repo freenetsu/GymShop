@@ -16,10 +16,10 @@ const LoginGithub = () => {
   return (
     <button
       onClick={handleLogin}
-      className="w-full gap-4 hover:cursor-pointer mt-6 h-12 bg-black border border-gray-700 rounded-md p-4 flex justify-center items-center hover:bg-gray-800"
+      className="w-full flex items-center justify-center gap-3 px-4 py-3 text-white bg-[#24292F] hover:bg-[#24292F]/90 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
     >
-      <FaGithub className="text-white" />
-      <span className="text-gray-300">Login with Github</span>
+      <FaGithub className="w-5 h-5" />
+      <span className="font-medium">Continuer avec GitHub</span>
     </button>
   );
 };
