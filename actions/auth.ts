@@ -7,18 +7,25 @@ import { revalidatePath } from "next/cache";
 
 export const login = async (provider: string) => {
   try {
-    await signIn(provider, { redirectTo: "/" });
-    revalidatePath("/");
+    await signIn(provider);
   } catch (error) {
-    console.error("Login error:", error);
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "OAuthSignin":
+          throw new Error("Erreur lors de la connexion avec " + provider);
+        case "OAuthCallback":
+          throw new Error("Erreur lors de la réponse de " + provider);
+        default:
+          throw new Error("Une erreur est survenue lors de la connexion");
+      }
+    }
     throw error;
   }
 };
 
 export const logout = async () => {
   try {
-    await signOut({ redirectTo: "/" });
-    revalidatePath("/");
+    await signOut();
   } catch (error) {
     console.error("Logout error:", error);
     throw error;
@@ -33,7 +40,7 @@ const getUserByEmail = async (email: string) => {
     return user;
   } catch (error) {
     console.error("Error getting user:", error);
-    return null;
+    throw error;
   }
 };
 

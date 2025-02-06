@@ -1,17 +1,14 @@
-import { PrismaClient } from "@prisma/client/edge";
-import { withAccelerate } from '@prisma/extension-accelerate';
+import { PrismaClient } from "@prisma/client";
 
-const prismaClientSingleton = () => {
-  return new PrismaClient({
+const globalForPrisma = global as typeof globalThis & {
+  prisma?: PrismaClient;
+};
+
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
     log: ["query", "error", "warn"],
-  }).$extends(withAccelerate());
-};
-
-const globalForPrisma = globalThis as unknown as {
-  prisma: ReturnType<typeof prismaClientSingleton> | undefined;
-};
-
-export const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
+  });
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
@@ -21,9 +18,9 @@ if (process.env.NODE_ENV !== "production") {
 export async function connectDB() {
   try {
     await prisma.$connect();
-    console.log('Successfully connected to the database');
+    console.log("Base de données connectée avec succès");
   } catch (error) {
-    console.error('Failed to connect to the database:', error);
+    console.error("Erreur de connexion à la base de données:", error);
     throw error;
   }
 }

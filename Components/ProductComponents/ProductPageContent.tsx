@@ -1,6 +1,7 @@
 // Components/ProductPageContent.tsx
 import { getProductById } from "@/actions/actions";
 import { ProductDetails } from "@/Components/ProductComponents/ProductDetails";
+import { notFound } from "next/navigation";
 
 type ProductPageContentProps = {
   productId: string;
@@ -9,7 +10,10 @@ type ProductPageContentProps = {
 export const ProductPageContent = async ({
   productId,
 }: ProductPageContentProps) => {
-  const product = await getProductById(productId);
-
-  return <ProductDetails product={product} />;
+  try {
+    const product = await getProductById(productId);
+    return <ProductDetails product={product} />;
+  } catch (error) {
+    notFound();
+  }
 };
